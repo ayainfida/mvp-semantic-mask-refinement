@@ -1,0 +1,43 @@
+# -------------------------
+# OS / editor junk
+# -------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# -------------------------
+# Python / build artifacts
+# -------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# -------------------------
+# Notebooks
+# -------------------------
+.ipynb_checkpoints/
+
+# -------------------------
+# Large data / datasets
+# (keep a small README if you want)
+# -------------------------
+data/
+!data/README.md
+!data/*.txt
+
+# If you want to allow tiny config files in subfolders:
+# !data/**/README.md
+
+# -------------------------
+# Model checkpoints / weights
+# -------------------------
+*.pt
+*.pth
+checkpoints/
