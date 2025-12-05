@@ -3,10 +3,6 @@ import torch
 import torch.nn.functional as F
 
 def binary_erosion(mask, kernel_size=3):
-    """
-    mask: (1,1,H,W) float tensor in {0,1}
-    returns eroded mask with same shape
-    """
     # min-pool via max-pool on inverted mask
     pad = kernel_size // 2
     inv = 1.0 - mask
@@ -16,10 +12,6 @@ def binary_erosion(mask, kernel_size=3):
 
 
 def seg_to_boundary(mask, thickness=1):
-    """
-    mask: (1,1,H,W) float tensor in {0,1}
-    returns boundary mask (1,1,H,W) float in {0,1}
-    """
     eroded = binary_erosion(mask, kernel_size=3)
     boundary = mask - eroded
     boundary = (boundary > 0.5).float()
@@ -35,10 +27,6 @@ def seg_to_boundary(mask, thickness=1):
 
 
 def boundary_f1_single(gt, pred, num_classes, tolerance=2, ignore_background=True):
-    """
-    gt, pred: (H,W) long tensors with labels in [0, num_classes-1]
-    returns mean boundary F1 over classes present in this image.
-    """
     gt = gt.to(torch.long)
     pred = pred.to(torch.long)
 
@@ -86,9 +74,6 @@ def boundary_f1_single(gt, pred, num_classes, tolerance=2, ignore_background=Tru
 
 @torch.no_grad()
 def boundary_f1_score(model, loader, num_classes, device, tolerance=2, ignore_background=True):
-    """
-    Mean boundary F1 over all images in loader.
-    """
     model.eval()
     total_f1 = 0.0
     count = 0

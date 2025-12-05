@@ -72,10 +72,6 @@ coco_image_transform = torchvision.transforms.Compose([
 ])
 
 def coco_process_map(mask_tensor):
-    """
-    mask_tensor: [1,H,W] uint8 from PILToTensor, values 0/1/2
-    returns: [1,H,W] Long with same class indices
-    """
     return mask_tensor.long()
 
 coco_map_transform = torchvision.transforms.Compose([

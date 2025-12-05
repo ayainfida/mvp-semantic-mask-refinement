@@ -20,7 +20,6 @@ def build_mask_generator(sam_model):
 
 
 def tensor_to_rgb_uint8(img_tensor, mean_rgb, std_rgb):
-    """De-normalise tensor [3,H,W] -> uint8 RGB [H,W,3]."""
     img = img_tensor.cpu().clone()
     for c in range(3):
         img[c] = img[c] * std_rgb[c] + mean_rgb[c]
@@ -30,7 +29,6 @@ def tensor_to_rgb_uint8(img_tensor, mean_rgb, std_rgb):
 
 
 def run_sam_auto(image_uint8, mask_generator):
-    """Run SAM on a uint8 RGB image, return list of boolean masks."""
     masks = mask_generator.generate(image_uint8)
     masks = sorted(masks, key=lambda x: x["area"], reverse=True)
     return [m["segmentation"] for m in masks]
@@ -46,9 +44,6 @@ def binary_iou(pred_bool, gt_bool):
 # Boundary F1 helpers
 # -----------------------------
 def binary_erosion(mask, kernel_size=3):
-    """
-    mask: (1,1,H,W) float in {0,1}
-    """
     pad = kernel_size // 2
     inv = 1.0 - mask
     eroded_inv = F.max_pool2d(inv, kernel_size=kernel_size, stride=1, padding=pad)
@@ -57,10 +52,6 @@ def binary_erosion(mask, kernel_size=3):
 
 
 def seg_to_boundary(mask, thickness=1):
-    """
-    mask: (1,1,H,W) float in {0,1}
-    returns boundary mask (1,1,H,W)
-    """
     eroded = binary_erosion(mask, kernel_size=3)
     boundary = mask - eroded
     boundary = (boundary > 0.5).float()
@@ -79,10 +70,6 @@ def seg_to_boundary(mask, thickness=1):
 
 
 def boundary_f1_single(gt, pred, num_classes, tolerance=2, ignore_background=True):
-    """
-    gt, pred: (H,W) long
-    returns mean boundary F1 over foreground classes.
-    """
     gt = gt.to(torch.long)
     pred = pred.to(torch.long)
     class_range = range(1, num_classes) if ignore_background else range(num_classes)
@@ -136,11 +123,6 @@ def visualize_unet_vs_sam_subset(
     person_label=1,
     max_examples=8,
 ):
-    """
-    Draws a grid comparing:
-      Input | GT | U-Net | SAM
-    and prints IoU + Boundary-F1 for the person class.
-    """
     unet_model.eval()
 
     examples = []

@@ -19,15 +19,6 @@ def refine_with_multiple_steps(
     t_level=0,
     device="cuda",
 ):
-    """
-    images:   [B,3,H,W]
-    num_steps: how many refinement iterations to apply
-    t_level:  diffusion timestep in [0, T] used for all steps
-
-    Returns:
-        logits_base:   baseline logits (before refinement)
-        refined_logits: logits after num_steps refinement
-    """
     diffusion_model.eval()
     baseline_model.eval()
 
@@ -123,10 +114,6 @@ def evaluate_refiner_runtime_quality(
     num_classes,
     device,
 ):
-    """
-    Returns:
-        {num_steps: (runtime_per_image, acc, iou_list, miou, bf1)}
-    """
     results = {}
     diffusion_model.eval()
     baseline_model.eval()

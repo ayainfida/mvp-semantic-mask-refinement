@@ -22,16 +22,6 @@ def refine_with_multiple_steps(
     mode="full",   # "full", "no_image", "no_logits", "no_probs"
     device="cuda",
 ):
-    """
-    images:    [B,3,H,W] (already normalized)
-    num_steps: how many refinement iterations to apply
-    t_level:   diffusion timestep in [0, T] used for all steps
-    mode:      ablation on conditioning
-
-    Returns:
-        logits_base:   baseline logits (before refinement)
-        refined_logits: logits after refinement
-    """
     diffusion_model.eval()
     baseline_model.eval()
 
@@ -89,16 +79,6 @@ def evaluate_model_from_logits_fn(
     bf1_tolerance=2,
     bf1_ignore_background=True,
 ):
-    """
-    logits_fn: function(images, labels) -> preds [B,H,W]
-
-    Returns:
-        confusion: (C,C) tensor
-        acc:       float
-        iou_list:  list of length C
-        miou:      float
-        bf1:       float or None
-    """
     confusion = torch.zeros(num_classes ** 2, dtype=torch.int64)
     total_bf1 = 0.0
     count_bf1 = 0
@@ -156,20 +136,6 @@ def run_task4_quant_ablation(
     steps=(1, 2, 3),
     modes=("full", "no_image", "no_logits", "no_probs"),
 ):
-    """
-    Runs:
-      - baseline metrics
-      - refined metrics for different num_steps (full conditioning)
-      - ablation over conditioning & steps
-
-    Returns:
-      baseline_metrics: dict
-      df_full_refinement: DataFrame (baseline + refined)
-      df_ablation:        DataFrame (modes x steps)
-      refined_results_full: dict[steps] -> metrics dict
-      ablation_results:     dict[(mode, steps)] -> metrics dict
-    """
-
     # ---- baseline ----
     def baseline_logits_fn(images, labels=None):
         images = images.to(device)
@@ -346,10 +312,6 @@ def run_task4_quant_ablation(
 # 4) Qualitative visualisation
 # ------------------------------------------------
 def denormalize_image(tensor, mean_rgb, std_rgb):
-    """
-    tensor: (3,H,W) normalized
-    mean_rgb, std_rgb: lists of length 3
-    """
     mean = torch.tensor(mean_rgb).view(3, 1, 1)
     std = torch.tensor(std_rgb).view(3, 1, 1)
     return (tensor * std + mean).clamp(0.0, 1.0)
@@ -370,13 +332,7 @@ def visualize_baseline_vs_diffusion_steps(
     num_samples=3,
     device="cuda",
 ):
-    """
-    Shows:
-      - Input
-      - GT
-      - Baseline prediction
-      - Refined prediction for each k in steps_to_show
-    """
+
     baseline_model.eval()
     diffusion_model.eval()
 
