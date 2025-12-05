@@ -19,11 +19,6 @@ import matplotlib.pyplot as plt
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def batch_mean_iou(preds, labels, num_classes):
-    """
-    preds:  (B,H,W) long
-    labels: (B,H,W) long
-    returns: scalar mIoU over this batch
-    """
     conf = torch.zeros(num_classes ** 2, dtype=torch.int64, device=preds.device)
     entries = preds * num_classes + labels
     counts = torch.bincount(entries.view(-1), minlength=num_classes ** 2)
@@ -55,13 +50,6 @@ sqrt_alphas_cumprod = torch.sqrt(alphas_cumprod)                 # [T+1]
 sqrt_one_minus_alphas_cumprod = torch.sqrt(1.0 - alphas_cumprod) # [T+1]
 
 def q_sample(x0, t, noise=None):
-    """
-    Forward diffusion:
-        x_t = sqrt(ᾱ_t) * x0 + sqrt(1-ᾱ_t) * ε
-
-    x0: (B,C,H,W) in [0,1]
-    t:  (B,) long, each in [0, T]  (0 = no noise)
-    """
     if noise is None:
         noise = torch.randn_like(x0)
 
@@ -70,16 +58,6 @@ def q_sample(x0, t, noise=None):
     return s_ac * x0 + s_om * noise
 
 def build_diffusion_input(x_t, t, cond_probs, cond_logits, images):
-    """
-    x_t:        (B,C,H,W)  noisy baseline probabilities
-    t:          (B,)       timesteps
-    cond_probs: (B,C,H,W)  baseline probabilities
-    cond_logits:(B,C,H,W)  baseline logits
-    images:     (B,3,H,W)  normalized RGB images
-
-    returns: (B, in_channels, H, W),
-             in_channels = C + 1 + C + C + 3 = 3C + 4
-    """
     B, C, H, W = x_t.shape
     t_norm = t.float() / max(T, 1)
     t_img = t_norm.view(B, 1, 1, 1).expand(-1, 1, H, W)        # (B,1,H,W)
@@ -93,7 +71,6 @@ def build_diffusion_input(x_t, t, cond_probs, cond_logits, images):
 class DiffConvBlock(nn.Module):
     """
     A UNet block with optional downscale / upscale.
-    Independent from your baseline ConvBlock.
     """
     def __init__(self, in_ch, out_ch, downscale=False, upscale=False):
         super().__init__()
