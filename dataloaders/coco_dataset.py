@@ -8,11 +8,6 @@ import torchvision.transforms.functional as TF
 
 
 class COCODataset(Dataset):
-    """
-    COCO pets dataset:
-      - root/images: RGB .jpg
-      - root/masks:  0 = bg, 1 = cat, 2 = dog (uint8 .png)
-    """
 
     def __init__(self, root, train, image_transform, map_transform,
                  train_split=0.85, shuffle=True):
